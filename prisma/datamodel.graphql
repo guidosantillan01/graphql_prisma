@@ -12,3 +12,11 @@ type Post {
   published: Boolean!
   author: User!
 }
+
+# 1. Copy the comment type definition and mark the id as unique
+type Comment {
+  id: ID! @unique
+  text: String!
+  author: User!
+  post: Post!
+}
