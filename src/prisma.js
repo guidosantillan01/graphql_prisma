@@ -5,86 +5,88 @@ const prisma = new Prisma({
   endpoint: 'http://localhost:4466' // Where the Prisma GraphQL API lives
 });
 
-// These methods return a Promise. E.g prisma.query.createPost() -> Promise
-// prisma.query
-// prisma.mutation
-// prisma.subscription
-// prisma.exists
+export { prisma as default };
 
-// prisma.exists
-//   .Comment({
-//     id: 'cjxf4mcxi006x0831q5o00nq5',
-//     author: {
-//       id: 'cjxf3udhf00c00831woz0a57y'
-//     }
-//   })
-//   .then(exists => {
-//     console.log(exists);
-//   });
+// // These methods return a Promise. E.g prisma.query.createPost() -> Promise
+// // prisma.query
+// // prisma.mutation
+// // prisma.subscription
+// // prisma.exists
 
-const createPostForUser = async (authorId, data) => {
-  const userExists = await prisma.exists.User({ id: authorId });
+// // prisma.exists
+// //   .Comment({
+// //     id: 'cjxf4mcxi006x0831q5o00nq5',
+// //     author: {
+// //       id: 'cjxf3udhf00c00831woz0a57y'
+// //     }
+// //   })
+// //   .then(exists => {
+// //     console.log(exists);
+// //   });
 
-  if (!userExists) {
-    throw new Error('User not found');
-  }
+// const createPostForUser = async (authorId, data) => {
+//   const userExists = await prisma.exists.User({ id: authorId });
 
-  const post = await prisma.mutation.createPost(
-    {
-      data: {
-        ...data,
-        author: {
-          connect: {
-            id: authorId
-          }
-        }
-      }
-    },
-    '{ author { id name email posts { id title published }} }'
-  );
+//   if (!userExists) {
+//     throw new Error('User not found');
+//   }
 
-  return post.author;
-};
+//   const post = await prisma.mutation.createPost(
+//     {
+//       data: {
+//         ...data,
+//         author: {
+//           connect: {
+//             id: authorId
+//           }
+//         }
+//       }
+//     },
+//     '{ author { id name email posts { id title published }} }'
+//   );
 
-// createPostForUser('cjxf4ufbd00b20831c6ot1qeb', {
-//   title: 'Great books to read VV',
-//   body: 'The war of art VV',
-//   published: true
-// })
-//   .then(user => {
-//     console.log(JSON.stringify(user, undefined, 2));
-//   })
-//   .catch(error => {
-//     console.log(error.message);
-//   });
+//   return post.author;
+// };
 
-const updatePostForUser = async (postId, data) => {
-  const postExists = await prisma.exists.Post({ id: postId });
+// // createPostForUser('cjxf4ufbd00b20831c6ot1qeb', {
+// //   title: 'Great books to read VV',
+// //   body: 'The war of art VV',
+// //   published: true
+// // })
+// //   .then(user => {
+// //     console.log(JSON.stringify(user, undefined, 2));
+// //   })
+// //   .catch(error => {
+// //     console.log(error.message);
+// //   });
 
-  if (!postExists) {
-    throw new Error('Post not found');
-  }
+// const updatePostForUser = async (postId, data) => {
+//   const postExists = await prisma.exists.Post({ id: postId });
 
-  const post = await prisma.mutation.updatePost(
-    {
-      where: {
-        id: postId
-      },
-      data
-    },
-    '{ author { id name email posts { id title published } }}'
-  );
+//   if (!postExists) {
+//     throw new Error('Post not found');
+//   }
 
-  return post.author;
-};
+//   const post = await prisma.mutation.updatePost(
+//     {
+//       where: {
+//         id: postId
+//       },
+//       data
+//     },
+//     '{ author { id name email posts { id title published } }}'
+//   );
 
-// updatePostForUser('cjxfbk5ag00n508310oocyurf', {
-//   title: 'Updated title from async await function',
-//   published: false
-// })
-//   .then(user => {
-//     console.log(JSON.stringify(user, undefined, 2));
-//   })
-//   .catch(error => {
-//     console.log(error.message);
-//   });
+//   return post.author;
+// };
+
+// // updatePostForUser('cjxfbk5ag00n508310oocyurf', {
+// //   title: 'Updated title from async await function',
+// //   published: false
+// // })
+// //   .then(user => {
+// //     console.log(JSON.stringify(user, undefined, 2));
+// //   })
+// //   .catch(error => {
+// //     console.log(error.message);
+// //   });
