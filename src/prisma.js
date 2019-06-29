@@ -2,7 +2,15 @@ import { Prisma } from 'prisma-binding';
 
 const prisma = new Prisma({
   typeDefs: 'src/generated/prisma.graphql',
-  endpoint: 'http://localhost:4466' // Where the Prisma GraphQL API lives
+  endpoint: 'http://localhost:4466', // Where the Prisma GraphQL API lives
+  secret: 'thisisasecrettext' // Now I am able to communicate with Prisma with Node.js.
+  // To create a token so the :4465 GraphQL Playground client can access our Prisma server we need to:
+  // `cd prisma`
+  // `prisma token`
+  // Copy that token to the HTTP HEADERS option in this JSON format:
+  // {
+  //   "Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InNlcnZpY2UiOiJkZWZhdWx0QGRlZmF1bHQiLCJyb2xlcyI6WyJhZG1pbiJdfSwiaWF0IjoxNTYxNzg0MTM5LCJleHAiOjE1NjIzODg5Mzl9.3e4jgxhl2TSsg08_wgn0BmQrzTQC_h2HVOb07D9HIPM"
+  // }
 });
 
 export { prisma as default };
