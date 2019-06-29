@@ -1,45 +1,29 @@
 import uuidv4 from 'uuid';
 
-// Enums
-
 const Mutation = {
-  createUser(parent, args, { db }, info) {
-    const emailTaken = db.users.some(user => user.email === args.data.email);
+  async createUser(parent, args, { prisma }, info) {
+    const emailTaken = await prisma.exists.User({ email: args.data.email });
 
     if (emailTaken) {
-      throw new Error('Email taken.');
+      throw new Error('Email taken');
     }
 
-    const user = {
-      id: uuidv4(),
-      ...args.data
-    };
+    // You could also have done:
+    // const user = await prisma.mutation.createUser({ data: args.data }, info);
+    // return user;
 
-    db.users.push(user);
-
-    return user;
+    return prisma.mutation.createUser({ data: args.data }, info);
   },
-  deleteUser(parent, args, { db }, info) {
-    const userIndex = db.users.findIndex(user => user.id === args.id);
+  async deleteUser(parent, args, { prisma }, info) {
+    const userExists = await prisma.exists.User({ id: args.id });
 
-    if (userIndex === -1) {
+    if (!userExists) {
       throw new Error('User not found');
     }
 
-    const deletedUsers = db.users.splice(userIndex, 1);
+    // Comments and Posts are also deleted because of the relationship. (@relation)
 
-    // Delete posts and comments from deleted user
-    db.posts = db.posts.filter(post => {
-      const match = post.author === args.id;
-      if (match) {
-        db.comments = db.comments.filter(comment => comment.post !== post.id);
-      }
-      return !match;
-    });
-
-    db.comments = db.comments.filter(comment => comment.author !== args.id);
-
-    return deletedUsers[0]; // Return the first and only item from the array
+    return prisma.mutation.deleteUser({ where: { id: args.id } }, info);
   },
   updateUser(parent, args, { db }, info) {
     const { id, data } = args;
