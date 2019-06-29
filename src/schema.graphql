@@ -86,6 +86,7 @@ type Comment {
   post: Post!
 }
 
+## Subscription stuff
 enum MutationType {
   CREATED
   UPDATED
@@ -94,11 +95,10 @@ enum MutationType {
 
 type PostSubscriptionPayload {
   mutation: MutationType!
-  data: Post!
+  node: Post
 }
 
-# 1. Set up a custom payload type for comment subscription with "mutation" and "data
 type CommentSubscriptionPayload {
   mutation: MutationType!
-  data: Comment!
+  node: Comment
 }

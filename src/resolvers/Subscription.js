@@ -1,20 +1,44 @@
 const Subscription = {
-  // Object
   comment: {
-    // Method
-    subscribe(parent, { postId }, { db, pubsub }, info) {
-      const post = db.posts.find(post => post.id === postId && post.published);
+    subscribe(parent, { postId }, { prisma }, info) {
+      // We needed to change the schema.graphql file. data to node
+      // type CommentSubscriptionPayload {
+      //   mutation: MutationType!
+      //   node: Comment
+      // }
 
-      if (!post) {
-        throw new Error('Post not found');
-      }
-
-      return pubsub.asyncIterator(`comment ${postId}`); // Channel name
+      return prisma.subscription.comment(
+        {
+          where: {
+            node: {
+              post: {
+                id: postId
+              }
+            }
+          }
+        },
+        info
+      );
     }
   },
   post: {
-    subscribe(parent, args, { pubsub }, info) {
-      return pubsub.asyncIterator(`post`);
+    subscribe(parent, args, { prisma }, info) {
+      // We needed to change the schema.graphql file. data to node
+      // type PostSubscriptionPayload {
+      //   mutation: MutationType!
+      //   node: Post
+      // }
+
+      return prisma.subscription.post(
+        {
+          where: {
+            node: {
+              published: true
+            }
+          }
+        },
+        info
+      );
     }
   }
 };
