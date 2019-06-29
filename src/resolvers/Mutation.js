@@ -84,77 +84,46 @@ const Mutation = {
       info
     );
   },
-  createComment(parent, args, { db, pubsub }, info) {
-    const userExists = db.users.some(user => user.id === args.data.author);
-    const postExists = db.posts.some(
-      post => post.id === args.data.post && post.published
+  async createComment(parent, args, { prisma }, info) {
+    return prisma.mutation.createComment(
+      {
+        data: {
+          text: args.data.text,
+          author: {
+            connect: {
+              id: args.data.author
+            }
+          },
+          post: {
+            connect: {
+              id: args.data.post
+            }
+          }
+        }
+      },
+      info
     );
-
-    if (!userExists || !postExists) {
-      throw new Error('Unable to find user and post');
-    }
-
-    const comment = {
-      id: uuidv4(),
-      ...args.data
-    };
-
-    db.comments.push(comment);
-
-    // 2. Update publish call in createComment to send back CREATED with the data
-    // channel name
-    pubsub.publish(`comment ${args.data.post}`, {
-      comment: {
-        mutation: 'CREATED',
-        data: comment
-      }
-    });
-
-    return comment;
   },
-  deleteComment(parent, args, { db, pubsub }, info) {
-    const commentIndex = db.comments.findIndex(
-      comment => comment.id === args.id
+  async deleteComment(parent, args, { prisma }, info) {
+    return prisma.mutation.deleteComment(
+      {
+        where: {
+          id: args.id
+        }
+      },
+      info
     );
-
-    if (commentIndex === -1) {
-      throw new Error('Comment not found');
-    }
-
-    const [deletedComment] = db.comments.splice(commentIndex, 1);
-
-    // 3. Add publish call in deleteComment using DELETED event
-    pubsub.publish(`comment ${deletedComment.post}`, {
-      comment: {
-        mutation: 'DELETED',
-        data: deletedComment
-      }
-    });
-
-    return deletedComment;
   },
-  updateComment(parent, args, { db, pubsub }, info) {
-    const { id, data } = args;
-
-    const comment = db.comments.find(comment => comment.id === id);
-
-    if (!comment) {
-      throw new Error('Comment not found');
-    }
-
-    if (typeof data.text === 'string') {
-      comment.text = data.text;
-    }
-
-    // 4. Add publish call in updateComment using UPDATED event
-    pubsub.publish(`comment ${comment.post}`, {
-      comment: {
-        mutation: 'UPDATED',
-        data: comment
-      }
-    });
-
-    return comment;
+  async updateComment(parent, args, { prisma }, info) {
+    return prisma.mutation.updateComment(
+      {
+        where: {
+          id: args.id
+        },
+        data: args.data
+      },
+      info
+    );
   }
 };
 
