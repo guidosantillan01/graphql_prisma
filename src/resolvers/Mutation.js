@@ -1,35 +1,28 @@
-import uuidv4 from 'uuid';
+import bcrypt from 'bcryptjs';
+
+// Take in password -> Validate password -> Hash password (bcryptjs package) -> Generate auth token
 
 const Mutation = {
   async createUser(parent, args, { prisma }, info) {
-    // Prisma handles these type of errors, so we can delete this code.
-    // const emailTaken = await prisma.exists.User({ email: args.data.email });
+    const inputPassword = args.data.password;
 
-    // if (emailTaken) {
-    //   throw new Error('Email taken');
-    // }
+    if (inputPassword.length < 8) {
+      throw new Error('Password must be 8 characters or longer');
+    }
 
-    // You could also have done:
-    // const user = await prisma.mutation.createUser({ data: args.data }, info);
-    // return user;
+    const hashedPassword = await bcrypt.hash(inputPassword, 10); // (password, number of salt rounds)
 
     return prisma.mutation.createUser(
       {
-        data: args.data
+        data: {
+          ...args.data,
+          password: hashedPassword
+        }
       },
       info
     );
   },
   async deleteUser(parent, args, { prisma }, info) {
-    // Prisma handles these type of errors, so we can delete this code.
-    // const userExists = await prisma.exists.User({ id: args.id });
-
-    // if (!userExists) {
-    //   throw new Error('User not found');
-    // }
-
-    // Comments and Posts are also deleted because of the relationship. (@relation)
-
     return prisma.mutation.deleteUser(
       {
         where: { id: args.id }
