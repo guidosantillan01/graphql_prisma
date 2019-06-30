@@ -1,19 +1,42 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-// Take in password -> Validate password -> Hash password (bcryptjs package)
-// -> Generate auth token : JSON Web Token (JWT)
-// const token = jwt.sign({ id: 46 }, 'mysecret')
-// console.log(token) -> eyJhbG.........
+// Section #70
+// const isMatch = await bcrypt.compare(password, hashedPassword)
+// console.log(isMatch) -> true
 
-// const decoded = jwt.decode(token)
-// console.log(decoded) -> { id: 46, iat: 1533647675 }
-
-// Verify the tokens were created by the user
-// const verification = jwt.verify(token, 'mysecret')
-// console.log(verification) -> { id: 46, iat: 1533647675 }
+const secret = 'secretsecret';
 
 const Mutation = {
+  async login(parent, args, { prisma }, info) {
+    const inputEmail = args.data.email;
+    const inputPassword = args.data.password;
+
+    const user = await prisma.query.user({
+      where: {
+        email: inputEmail
+      }
+    });
+
+    if (!user) {
+      throw new Error('Unable to login');
+    }
+
+    const storedPassword = user.password;
+
+    const isMatch = await bcrypt.compare(inputPassword, storedPassword);
+
+    if (!isMatch) {
+      throw new Error('Unable to login');
+    }
+
+    const token = jwt.sign({ userId: user.id }, secret);
+
+    return {
+      user,
+      token
+    };
+  },
   async createUser(parent, args, { prisma }, info) {
     const inputPassword = args.data.password;
 
@@ -35,7 +58,7 @@ const Mutation = {
 
     return {
       user,
-      token: jwt.sign({ userId: user.id }, 'secretsecret')
+      token: jwt.sign({ userId: user.id }, secret)
     };
   },
   async deleteUser(parent, args, { prisma }, info) {
