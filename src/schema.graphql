@@ -79,8 +79,8 @@ input UpdateCommentInput {
 type User {
   id: ID!
   name: String!
-  email: String!
-  password: String!
+  email: String # Make the email nullable
+  password: String
   posts: [Post!]!
   comments: [Comment!]!
 }
