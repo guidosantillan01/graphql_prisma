@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 
 import generateToken from '../utils/generateToken';
 import getUserId from '../utils/getUserId';
+import hashPassword from '../utils/hashPassword';
 
 const Mutation = {
   async login(parent, args, { prisma }, info) {
@@ -29,12 +30,7 @@ const Mutation = {
     };
   },
   async createUser(parent, args, { prisma }, info) {
-    const inputPassword = args.data.password;
-    if (inputPassword.length < 8) {
-      throw new Error('Password must be 8 characters or longer');
-    }
-
-    const hashedPassword = await bcrypt.hash(inputPassword, 10); // (password, number of salt rounds)
+    const hashedPassword = await hashPassword(args.data.password);
     const user = await prisma.mutation.createUser(
       {
         data: {
@@ -64,6 +60,12 @@ const Mutation = {
   },
   async updateUser(parent, args, { prisma, request }, info) {
     const userId = getUserId(request);
+    const inputPassword = args.data.password;
+
+    if (typeof inputPassword === 'string') {
+      // To check if a password was submitted
+      inputPassword = await hashPassword(inputPassword);
+    }
 
     return prisma.mutation.updateUser(
       {
