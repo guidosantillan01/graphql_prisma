@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 
 const secret = 'secretsecret';
 
-const getUserId = request => {
+const getAuthenticatedUserId = request => {
   const header = request.request.headers.authorization;
 
   if (!header) {
@@ -15,4 +15,4 @@ const getUserId = request => {
   return decoded.userId;
 };
 
-export { getUserId as default };
+export { getAuthenticatedUserId as default };
