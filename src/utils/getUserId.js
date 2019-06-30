@@ -3,7 +3,11 @@ import jwt from 'jsonwebtoken';
 const secret = 'secretsecret';
 
 const getUserId = (request, requireAuth = true) => {
-  const header = request.request.headers.authorization;
+  // request.request.headers.authorization for HTTP
+  // request.connection.context.Authorization for Web Sockers (subscriptions)
+  const header = request.request
+    ? request.request.headers.authorization
+    : request.connection.context.Authorization;
 
   if (header) {
     const token = header.replace('Bearer ', '');
