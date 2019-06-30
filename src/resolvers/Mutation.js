@@ -1,9 +1,7 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 
+import generateToken from '../utils/generateToken';
 import getUserId from '../utils/getUserId';
-
-const secret = 'secretsecret';
 
 const Mutation = {
   async login(parent, args, { prisma }, info) {
@@ -15,35 +13,28 @@ const Mutation = {
         email: inputEmail
       }
     });
-
     if (!user) {
       throw new Error('Unable to login');
     }
 
     const storedPassword = user.password;
-
     const isMatch = await bcrypt.compare(inputPassword, storedPassword);
-
     if (!isMatch) {
       throw new Error('Unable to login');
     }
 
-    const token = jwt.sign({ userId: user.id }, secret);
-
     return {
       user,
-      token
+      token: generateToken(user.id)
     };
   },
   async createUser(parent, args, { prisma }, info) {
     const inputPassword = args.data.password;
-
     if (inputPassword.length < 8) {
       throw new Error('Password must be 8 characters or longer');
     }
 
     const hashedPassword = await bcrypt.hash(inputPassword, 10); // (password, number of salt rounds)
-
     const user = await prisma.mutation.createUser(
       {
         data: {
@@ -51,12 +42,12 @@ const Mutation = {
           password: hashedPassword
         }
       }
-      // We delete the info parameter, it will return ALL scalar fields
+      // We delete the `info` parameter, it will return ALL scalar fields
     );
 
     return {
       user,
-      token: jwt.sign({ userId: user.id }, secret)
+      token: generateToken(user.id)
     };
   },
   async deleteUser(parent, args, { prisma, request }, info) {
