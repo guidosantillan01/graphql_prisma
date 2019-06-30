@@ -1,6 +1,17 @@
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
-// Take in password -> Validate password -> Hash password (bcryptjs package) -> Generate auth token
+// Take in password -> Validate password -> Hash password (bcryptjs package)
+// -> Generate auth token : JSON Web Token (JWT)
+// const token = jwt.sign({ id: 46 }, 'mysecret')
+// console.log(token) -> eyJhbG.........
+
+// const decoded = jwt.decode(token)
+// console.log(decoded) -> { id: 46, iat: 1533647675 }
+
+// Verify the tokens were created by the user
+// const verification = jwt.verify(token, 'mysecret')
+// console.log(verification) -> { id: 46, iat: 1533647675 }
 
 const Mutation = {
   async createUser(parent, args, { prisma }, info) {
@@ -12,15 +23,20 @@ const Mutation = {
 
     const hashedPassword = await bcrypt.hash(inputPassword, 10); // (password, number of salt rounds)
 
-    return prisma.mutation.createUser(
+    const user = await prisma.mutation.createUser(
       {
         data: {
           ...args.data,
           password: hashedPassword
         }
-      },
-      info
+      }
+      // We delete the info parameter, it will return ALL scalar fields
     );
+
+    return {
+      user,
+      token: jwt.sign({ userId: user.id }, 'secretsecret')
+    };
   },
   async deleteUser(parent, args, { prisma }, info) {
     return prisma.mutation.deleteUser(
