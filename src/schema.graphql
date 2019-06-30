@@ -10,8 +10,10 @@ type Mutation {
   login(data: LoginUserInput!): AuthPayload!
 
   createUser(data: CreateUserInput!): AuthPayload!
-  deleteUser(id: ID!): User!
-  updateUser(id: ID!, data: UpdateUserInput!): User!
+  # We can only delete ourselves, not other users.
+  deleteUser: User!
+  # We no longer need to send the id since our token has it already embedded.
+  updateUser(data: UpdateUserInput!): User!
 
   createPost(data: CreatePostInput!): Post!
   deletePost(id: ID!): Post!
