@@ -1,6 +1,8 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
+import getUserId from '../utils/getUserId';
+
 // Section #70
 // const isMatch = await bcrypt.compare(password, hashedPassword)
 // console.log(isMatch) -> true
@@ -61,7 +63,7 @@ const Mutation = {
       token: jwt.sign({ userId: user.id }, secret)
     };
   },
-  async deleteUser(parent, args, { prisma }, info) {
+  deleteUser(parent, args, { prisma }, info) {
     return prisma.mutation.deleteUser(
       {
         where: { id: args.id }
@@ -69,7 +71,7 @@ const Mutation = {
       info
     );
   },
-  async updateUser(parent, args, { prisma }, info) {
+  updateUser(parent, args, { prisma }, info) {
     return prisma.mutation.updateUser(
       {
         where: { id: args.id },
@@ -78,7 +80,15 @@ const Mutation = {
       info
     );
   },
-  async createPost(parent, args, { prisma }, info) {
+  createPost(parent, args, { prisma, request }, info) {
+    // Only an authenticated user can create a post
+    // Use HTTP Header with a valid token:
+    // {
+    //   "Authorization": "Bearer eyJhb...."
+    // }
+    // This header can be found at context() {...}
+    const userId = getUserId(request);
+
     return prisma.mutation.createPost(
       {
         data: {
@@ -87,7 +97,7 @@ const Mutation = {
           published: args.data.published,
           author: {
             connect: {
-              id: args.data.author
+              id: userId
             }
           }
         }
@@ -95,7 +105,7 @@ const Mutation = {
       info
     );
   },
-  async deletePost(parent, args, { prisma }, info) {
+  deletePost(parent, args, { prisma }, info) {
     return prisma.mutation.deletePost(
       {
         where: {
@@ -116,7 +126,7 @@ const Mutation = {
       info
     );
   },
-  async createComment(parent, args, { prisma }, info) {
+  createComment(parent, args, { prisma }, info) {
     return prisma.mutation.createComment(
       {
         data: {
@@ -136,7 +146,7 @@ const Mutation = {
       info
     );
   },
-  async deleteComment(parent, args, { prisma }, info) {
+  deleteComment(parent, args, { prisma }, info) {
     return prisma.mutation.deleteComment(
       {
         where: {
@@ -146,7 +156,7 @@ const Mutation = {
       info
     );
   },
-  async updateComment(parent, args, { prisma }, info) {
+  updateComment(parent, args, { prisma }, info) {
     return prisma.mutation.updateComment(
       {
         where: {

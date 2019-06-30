@@ -23,10 +23,15 @@ const server = new GraphQLServer({
     Post,
     Comment
   },
-  context: {
-    db,
-    pubsub,
-    prisma
+  // Change context from an object to a function that returns an object
+  context(request) {
+    // console.log(request.request.headers); // To check the Authorization header
+    return {
+      db,
+      pubsub,
+      prisma,
+      request
+    };
   }
 });
 
