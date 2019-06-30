@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-import getAuthenticatedUserId from '../utils/getAuthenticatedUserId';
+import getUserId from '../utils/getUserId';
 
 const secret = 'secretsecret';
 
@@ -60,7 +60,7 @@ const Mutation = {
     };
   },
   async deleteUser(parent, args, { prisma, request }, info) {
-    const userId = getAuthenticatedUserId(request);
+    const userId = getUserId(request);
 
     return prisma.mutation.deleteUser(
       {
@@ -72,7 +72,7 @@ const Mutation = {
     );
   },
   async updateUser(parent, args, { prisma, request }, info) {
-    const userId = getAuthenticatedUserId(request);
+    const userId = getUserId(request);
 
     return prisma.mutation.updateUser(
       {
@@ -91,7 +91,7 @@ const Mutation = {
     //   "Authorization": "Bearer eyJhb...."
     // }
     // This header can be found at context() {...}
-    const userId = getAuthenticatedUserId(request);
+    const userId = getUserId(request);
 
     return prisma.mutation.createPost(
       {
@@ -110,7 +110,7 @@ const Mutation = {
     );
   },
   async deletePost(parent, args, { prisma, request }, info) {
-    const userId = getAuthenticatedUserId(request);
+    const userId = getUserId(request);
     const postExists = await prisma.exists.Post({
       id: args.id,
       author: {
@@ -132,7 +132,7 @@ const Mutation = {
     );
   },
   async updatePost(parent, args, { prisma, request }, info) {
-    const userId = getAuthenticatedUserId(request);
+    const userId = getUserId(request);
     const postExists = await prisma.exists.Post({
       id: args.id,
       author: {
@@ -155,7 +155,7 @@ const Mutation = {
     );
   },
   createComment(parent, args, { prisma, request }, info) {
-    const userId = getAuthenticatedUserId(request);
+    const userId = getUserId(request);
 
     return prisma.mutation.createComment(
       {
@@ -177,7 +177,7 @@ const Mutation = {
     );
   },
   async deleteComment(parent, args, { prisma, request }, info) {
-    const userId = getAuthenticatedUserId(request);
+    const userId = getUserId(request);
     const commentExists = await prisma.exists.Comment({
       id: args.id,
       author: {
@@ -199,7 +199,7 @@ const Mutation = {
     );
   },
   async updateComment(parent, args, { prisma, request }, info) {
-    const userId = getAuthenticatedUserId(request);
+    const userId = getUserId(request);
     const commentExists = await prisma.exists.Comment({
       id: args.id,
       author: {
