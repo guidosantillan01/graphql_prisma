@@ -64,7 +64,7 @@ const Mutation = {
 
     if (typeof inputPassword === 'string') {
       // To check if a password was submitted
-      inputPassword = await hashPassword(inputPassword);
+      args.data.password = await hashPassword(inputPassword);
     }
 
     return prisma.mutation.updateUser(
