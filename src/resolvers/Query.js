@@ -5,7 +5,8 @@ const Query = {
     // operationArgs
     const opArgs = {
       first: args.first,
-      skip: args.skip
+      skip: args.skip,
+      after: args.after
     };
 
     if (args.query) {
@@ -27,7 +28,8 @@ const Query = {
         published: true // Don't expose unpublished posts
       },
       first: args.first,
-      skip: args.skip
+      skip: args.skip,
+      after: args.after
     };
 
     if (args.query) {
@@ -50,7 +52,10 @@ const Query = {
         author: {
           id: userId
         }
-      }
+      },
+      first: args.first,
+      skip: args.skip,
+      after: args.after
     };
 
     if (args.query) {
@@ -67,7 +72,13 @@ const Query = {
     return prisma.query.posts(opArgs, info);
   },
   comments(parent, args, { prisma }, info) {
-    return prisma.query.comments(null, info);
+    const opArgs = {
+      first: args.first,
+      skip: args.skip,
+      after: args.after
+    };
+
+    return prisma.query.comments(opArgs, info);
   },
   me(parent, args, { prisma, request }, info) {
     const userId = getUserId(request);
